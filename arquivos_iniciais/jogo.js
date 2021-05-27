@@ -72,6 +72,13 @@ const flappyBird = {
     altura: 24,
     x: 10,
     y: 50,
+    gravidade: 0.25,
+    velocidade: 0,
+    atualiza(){
+        flappyBird.velocidade += flappyBird.gravidade;
+        console.log(flappyBird.velocidade);
+        flappyBird.y = flappyBird.y + flappyBird.velocidade;
+    },
     desenha() {
         contexto.drawImage(
             sprites,
@@ -85,13 +92,75 @@ const flappyBird = {
 
 }
 
+// Menu inicial 
+const mensagemGetReady = {
+    sX: 134,
+    xY: 0,
+    w: 174,
+    h: 152,
+    x: (canvas.width / 2) - 174 / 2,
+    y: 50,
+    desenha() {
+        contexto.drawImage(
+            sprites,
+            mensagemGetReady.sX,mensagemGetReady.xY, // Sprite x, Sprite Y
+            mensagemGetReady.w, mensagemGetReady.h, //Tamanho do recorte na sprite
+            mensagemGetReady.x, mensagemGetReady.y,
+            mensagemGetReady.w, mensagemGetReady.h
+        );
+    }
+}
+
+//Telas.
+
+let telaAtiva = {};
+function mudaParaTela(novaTela){
+    telaAtiva = novaTela;
+}
+
+const Telas = {
+    INICIO: {
+        desenha() {
+            planoDeFundo.desenha();
+            chao.desenha();
+            flappyBird.desenha();
+            mensagemGetReady.desenha();
+        },
+        click(){
+            mudaParaTela(Telas.JOGO);
+        },
+        atualiza() {
+
+        }
+    }
+};
+
+Telas.JOGO = {
+    desenha() {
+        planoDeFundo.desenha();
+        chao.desenha();
+        flappyBird.desenha();
+    },
+    atualiza() {
+        flappyBird.atualiza()
+    }
+};
+
 // essa função faz a animação ficar em loop e ser vista no canvas
 function loop() {
-    planoDeFundo.desenha();
-    chao.desenha();
-    flappyBird.desenha();
+
+    telaAtiva.desenha();
+    telaAtiva.atualiza();
 
     requestAnimationFrame(loop);
 }
 
+window.addEventListener('click', function() {
+    if(telaAtiva.click){
+        telaAtiva.click();
+    }
+})
+
+mudaParaTela(Telas.INICIO);
 loop();
+
